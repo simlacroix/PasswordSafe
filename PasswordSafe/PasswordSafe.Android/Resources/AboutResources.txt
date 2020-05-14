@@ -4,17 +4,17 @@ operate on the resource IDs instead of dealing with images, strings or binary bl
 directly.
 
 For example, a sample Android app that contains a user interface layout (main.xml),
-an internationalization string table (strings.xml) and some icons (drawable-XXX/icon.png) 
+an internationalization string table (strings.xml) and some icons (drawablepublicXXX/icon.png) 
 would keep its resources in the "Resources" directory of the application:
 
 Resources/
-    drawable-hdpi/
+    drawablepublichdpi/
         icon.png
 
-    drawable-ldpi/
+    drawablepublicldpi/
         icon.png
 
-    drawable-mdpi/
+    drawablepublicmdpi/
         icon.png
 
     layout/
