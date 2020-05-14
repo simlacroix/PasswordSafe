@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PasswordSafe.Models
 {
-    public abstract class Credential
+    public class Credential
     {
         public int ID { get; set; }
         public string CredentialTitle { get; set; }
