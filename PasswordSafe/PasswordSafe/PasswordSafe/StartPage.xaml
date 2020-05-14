@@ -6,10 +6,16 @@
              mc:Ignorable="d"
              x:Class="PasswordSafe.StartPage">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+        <StackLayout BackgroundColor="Gray">
+            <Label Text="Please enter your combination" FontSize="Large"
+                   FontAttributes="Bold"
+                   TextColor="Black"
+                   HorizontalOptions="CenterAndExpand"/>
+            <Entry Placeholder="Combination..."
+                   IsPassword="True"/>
+            <Button Text="Access"
+                    CornerRadius="5"
+                    HorizontalOptions="Center"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
