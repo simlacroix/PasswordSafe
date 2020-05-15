@@ -12,7 +12,7 @@
                 <TableSection x:Name="old">
                     <EntryCell Label="Old Combination"/>
                 </TableSection>
-                <TableSection>                    
+                <TableSection>
                     <EntryCell Label="New Combination"/>
                     <EntryCell Label="Re-Enter New Combination"/>
                     <ViewCell>                        
