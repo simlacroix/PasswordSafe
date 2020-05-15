@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="PasswordSafe.CombinationPage">
+    <ContentPage.Content>
+        <TableView BackgroundColor="Gray">
+            <TableRoot>
+                <TableSection Title="Combination Settings"/>
+                <TableSection x:Name="old">
+                    <EntryCell Label="Old Combination"/>
+                </TableSection>
+                <TableSection>                    
+                    <EntryCell Label="New Combination"/>
+                    <EntryCell Label="Re-Enter New Combination"/>
+                    <ViewCell>                        
+                        <Button Text="Submit"
+                                HorizontalOptions="Center"
+                                CornerRadius="5"
+                                x:Name="submit"
+                                Clicked="submit_Clicked"/>
+                    </ViewCell>
+                </TableSection>
+                
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

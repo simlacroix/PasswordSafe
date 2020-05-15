@@ -10,19 +10,14 @@ using Xamarin.Forms.Xaml;
 namespace PasswordSafe
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class StartPage : ContentPage
+    public partial class CombinationPage : ContentPage
     {
-        public StartPage()
+        public CombinationPage()
         {
             InitializeComponent();
         }
 
-        private void access_Clicked(object sender, EventArgs e)
-        {
-
-        }
-
-        private void change_Clicked(object sender, EventArgs e)
+        private void submit_Clicked(object sender, EventArgs e)
         {
 
         }

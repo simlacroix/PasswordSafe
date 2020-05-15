@@ -21,6 +21,11 @@
                     HorizontalOptions="Center"
                     x:Name="access"
                     Clicked="access_Clicked"/>
+            <Button Text="Create/Change Combination"
+                    CornerRadius="5"
+                    HeightRequest="40"
+                    x:Name="change"
+                    Clicked="change_Clicked"/>
         </StackLayout>        
     </ContentPage.Content>
 </ContentPage>
