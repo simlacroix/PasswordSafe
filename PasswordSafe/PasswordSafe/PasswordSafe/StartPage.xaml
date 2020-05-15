@@ -4,18 +4,23 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="PasswordSafe.StartPage">
+             x:Class="PasswordSafe.StartPage"
+             BackgroundColor="Gray">
     <ContentPage.Content>
-        <StackLayout BackgroundColor="Gray">
+        <StackLayout VerticalOptions="CenterAndExpand" Padding="20">
             <Label Text="Please enter your combination" FontSize="Large"
                    FontAttributes="Bold"
                    TextColor="Black"
-                   HorizontalOptions="CenterAndExpand"/>
+                   HorizontalOptions="CenterAndExpand"
+                   Padding="15"/>
             <Entry Placeholder="Combination..."
-                   IsPassword="True"/>
+                   IsPassword="True"
+                   x:Name="combination"/>
             <Button Text="Access"
                     CornerRadius="5"
-                    HorizontalOptions="Center"/>
-        </StackLayout>
+                    HorizontalOptions="Center"
+                    x:Name="access"
+                    Clicked="access_Clicked"/>
+        </StackLayout>        
     </ContentPage.Content>
 </ContentPage>
