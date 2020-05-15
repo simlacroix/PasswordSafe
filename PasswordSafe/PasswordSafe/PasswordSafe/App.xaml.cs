@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PasswordSafe.DataHelper;
+using System;
 using System.IO;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -9,6 +10,7 @@ namespace PasswordSafe
     {
 
         private static LocalDB database;
+        private static IOPassOperations passOperations;
 
         public static LocalDB Database
         {
@@ -21,11 +23,22 @@ namespace PasswordSafe
             }
         }
 
+        public static IOPassOperations PassOperations
+        {
+            get
+            {
+                if (passOperations == null)
+                    passOperations = new IOPassOperations(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "pass.txt"));
+
+                return passOperations;
+            }
+        }
+
         public App()
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new NavigationPage(new StartPage());
         }
 
         protected override void OnStart()
