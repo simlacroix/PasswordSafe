@@ -4,17 +4,20 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="PasswordSafe.CombinationPage">
+             x:Class="PasswordSafe.CombinationPage"
+             Title="Combination Settings">
     <ContentPage.Content>
-        <TableView BackgroundColor="Gray">
+        <TableView BackgroundColor="Gray" x:Name="Table">
             <TableRoot>
-                <TableSection Title="Combination Settings"/>
-                <TableSection x:Name="old">
-                    <EntryCell Label="Old Combination"/>
+                <TableSection x:Name="oldSection">
+                    <EntryCell Label="Old Combination"
+                               x:Name="old"/>
                 </TableSection>
                 <TableSection>
-                    <EntryCell Label="New Combination"/>
-                    <EntryCell Label="Re-Enter New Combination"/>
+                    <EntryCell Label="New Combination"
+                               x:Name="theNew"/>
+                    <EntryCell Label="Re-Enter New Combination"
+                               x:Name="confirm"/>
                     <ViewCell>                        
                         <Button Text="Submit"
                                 HorizontalOptions="Center"
