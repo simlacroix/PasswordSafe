@@ -10,14 +10,41 @@
         <TableView BackgroundColor="Gray" x:Name="Table">
             <TableRoot>
                 <TableSection x:Name="oldSection">
-                    <EntryCell Label="Old Combination"
-                               x:Name="old"/>
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal"
+                                     Padding="10,5,0,0"
+                                     MinimumHeightRequest="50">
+                            <Label Text="Old Combination"
+                                   FontSize="Body"/>
+                            <Entry HorizontalOptions="FillAndExpand"
+                                   x:Name="old"
+                                   IsPassword="True"/>
+                        </StackLayout>
+                    </ViewCell>
                 </TableSection>
                 <TableSection>
-                    <EntryCell Label="New Combination"
-                               x:Name="theNew"/>
-                    <EntryCell Label="Re-Enter New Combination"
-                               x:Name="confirm"/>                    
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal"
+                                     Padding="10,5,0,0"
+                                     MinimumHeightRequest="50">
+                            <Label Text="New Combination"
+                                   FontSize="Body"/>
+                            <Entry HorizontalOptions="FillAndExpand"
+                                   x:Name="theNew"
+                                   IsPassword="True"/>
+                        </StackLayout>
+                    </ViewCell>
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal"
+                                     Padding="10,5,0,0"
+                                     MinimumHeightRequest="50">
+                            <Label Text="Re-Enter New Combination"
+                                   FontSize="Body"/>
+                            <Entry HorizontalOptions="FillAndExpand"
+                                   x:Name="confirm"
+                                   IsPassword="True"/>
+                        </StackLayout>
+                    </ViewCell>                                      
                     <ViewCell>                        
                         <Button Text="Submit"
                                 HorizontalOptions="Center"
