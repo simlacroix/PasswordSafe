@@ -18,12 +18,12 @@ namespace PasswordSafe
             _database.CreateTableAsync<Credential>().Wait();
         }
 
-        public Task<List<Credential>> GetAllUsersAsync()
+        public Task<List<Credential>> GetAllCredentialsAsync()
         {
             return _database.Table<Credential>().ToListAsync();
         }
 
-        public Task<int> SaveUserAsync(Credential credential)
+        public Task<int> SaveCredentialAsync(Credential credential)
         {
             //ID = 0 , default value >> new user
             if (credential.ID == 0)
@@ -33,7 +33,7 @@ namespace PasswordSafe
             return _database.UpdateAsync(credential);
         }
 
-        public Task<int> DeleteUserAsync(Credential credential)
+        public Task<int> DeleteCredentialAsync(Credential credential)
         {
             return _database.DeleteAsync(credential);
         }
