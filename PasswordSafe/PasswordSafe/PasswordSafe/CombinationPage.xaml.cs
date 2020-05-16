@@ -37,18 +37,25 @@ namespace PasswordSafe
                 if (!App.PassOperations.VerifyPass(old.Text))
                 {
                     await DisplayAlert("Error", "The old combination was incoreclty entered, please try again", "ok");
+                    old.Text = string.Empty;
+                    theNew.Text = string.Empty;
+                    confirm.Text = string.Empty;
                     return;
                 }                 
             }
             
-            if (theNew.Text == confirm.Text)
+            if (theNew.Text == confirm.Text && !String.IsNullOrWhiteSpace(theNew.Text))
             {
                 await DisplayAlert("Confirmed", "Combination was successfully changed", "ok");
                 App.PassOperations.ChangePass(theNew.Text);
                 await Navigation.PopAsync();
             }
             else
-                await DisplayAlert("Error", "Combination must be the same in both fields", "ok");
+            {
+                await DisplayAlert("Error", "Combination must be the same in both fields and not empty", "ok");
+                theNew.Text = string.Empty;
+                confirm.Text = string.Empty;
+            }                
         }
     }
 }

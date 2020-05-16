@@ -17,7 +17,7 @@
                     <EntryCell Label="New Combination"
                                x:Name="theNew"/>
                     <EntryCell Label="Re-Enter New Combination"
-                               x:Name="confirm"/>
+                               x:Name="confirm"/>                    
                     <ViewCell>                        
                         <Button Text="Submit"
                                 HorizontalOptions="Center"

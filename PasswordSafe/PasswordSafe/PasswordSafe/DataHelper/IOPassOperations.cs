@@ -13,24 +13,30 @@ namespace PasswordSafe.DataHelper
         {
             FileName = passPath;
         }
-
-        public void ChangePass(string pass)
-        {
-
-        }
-
+        
         public bool VerifyPass(string attempt)
         {
-
-            //placeholder
-            return false;
+            //will be more complicated later because of encryption
+            if (File.ReadAllText(FileName) == attempt)
+                return true;
+            else
+                return false;
         }
 
         public bool CheckPass()
         {
+            if (!File.Exists(FileName))
+                return false;
+            else if (String.IsNullOrWhiteSpace(File.ReadAllText(FileName)))
+                return false;
+            else
+                return true;
+        }
 
-            //placeholder
-            return false;
+        public void ChangePass(string pass)
+        {
+            //need to do some encryption here
+            File.WriteAllText(FileName, pass);
         }
 
     }
