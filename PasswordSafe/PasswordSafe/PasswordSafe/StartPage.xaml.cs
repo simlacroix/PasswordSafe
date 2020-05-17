@@ -29,6 +29,11 @@ namespace PasswordSafe
             {
                 //navigate to password list page
             }
+            else
+            {
+                DisplayAlert("Error", "Wrong combination", "ok");
+                combination.Text = string.Empty;
+            }
         }
 
         private void change_Clicked(object sender, EventArgs e)
