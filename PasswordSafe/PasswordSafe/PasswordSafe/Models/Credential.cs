@@ -6,10 +6,12 @@ namespace PasswordSafe.Models
 {
     public class Credential
     {
+        public static string[] credentialTypes = new string[] {"Default","Social Media","Banking","Wifi"};
+
         public int ID { get; set; }
         public string CredentialTitle { get; set; }
         public string Password { get; set; }
-        public DateTime expirationDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
         public string Notes { get; set; }
         public PasswordPolicy passwordPolicy { get; set; }
 
@@ -22,9 +24,5 @@ namespace PasswordSafe.Models
                 return passwordHistory[-1];
             return "";
         }
-    }
-
-    public class BaseCredential : Credential { 
-    
     }
 }
