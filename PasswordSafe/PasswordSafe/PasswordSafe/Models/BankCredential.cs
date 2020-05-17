@@ -8,25 +8,19 @@ namespace PasswordSafe.Models
     {
         public long CardNumber { get; set; }
         public int SecuirityCode { get; set; }
-
-        private Dictionary<string, string> securityQuestions = new Dictionary<string, string>();
-        public void AddSecurityQA(string question, string answer) {
-            securityQuestions.Add(question,answer);
-        }
-        public Dictionary<string, string> GetSecurityQuestions() {
-            return securityQuestions;
-        }
-
         public string Address { get; set; }
-        public string onlineBankingUrl { get; set; }
+        public string OnlineBankingUrl { get; set; }
 
-        private List<long> accounts = new List<long>();
-        public List<long> GetAccounts() {
-            return accounts;
-        }
+        public List<long> Accounts { get; }
+        public Dictionary<string, string> SecurityQuestions { get; }
+
+        // do we need this?
         public void AddAccounts(long newAccount) {
-            accounts.Add(newAccount);
+            Accounts.Add(newAccount);
         }
-
+        public void AddSecurityQA(string question, string answer)
+        {
+            SecurityQuestions.Add(question, answer);
+        }
     }
 }
