@@ -11,7 +11,5 @@ namespace PasswordSafe.Models
         public string PhoneNumber { get; set; }
         public string Name { get; set; }
         public string Link { get; set; }
-        public string picAttachment { get; set; }
-        
     }
 }

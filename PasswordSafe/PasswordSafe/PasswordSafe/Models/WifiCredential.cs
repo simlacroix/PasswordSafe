@@ -12,6 +12,5 @@ namespace PasswordSafe.Models
         public string SubnetMask { get; set; }
         public string DefaultGateway { get; set; }
         public string DnsServer { get; set; }
-        public string WirelessSecurityMode { get; set; }
     }
 }
