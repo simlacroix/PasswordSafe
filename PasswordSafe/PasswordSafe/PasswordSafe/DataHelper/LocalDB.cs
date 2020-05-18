@@ -15,13 +15,8 @@ namespace PasswordSafe
 
         public LocalDB(string dbPath)
         {
-
-            var connectionString = new SqliteConnectionStringBuilder()
-            {
-                DataSource = dbPath,
-                Mode = SqliteOpenMode.ReadWriteCreate,
-                Password = "combination"
-            }.ToString();
+            //this connection string will encrpyt the database with a keyword
+            SQLiteConnectionString connectionString = new SQLiteConnectionString(dbPath, true, "combination");
 
             _database = new SQLiteAsyncConnection(connectionString);
             _database.CreateTableAsync<Credential>().Wait();
