@@ -13,7 +13,7 @@ namespace PasswordSafe.Models
         public string Password { get; set; }
         public DateTime ExpirationDate { get; set; }
         public string Notes { get; set; }
-        public PasswordPolicy passwordPolicy { get; set; }
+        //public PasswordPolicy passwordPolicy { get; set; }
 
         protected List<string> passwordHistory = new List<string>();
         public void UpdatePasswordPolicy(string oldPassword) {
