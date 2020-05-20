@@ -27,7 +27,7 @@ namespace PasswordSafe
             string safeCombination = combination.Text;
             if (App.PassOperations.VerifyPass(safeCombination))
             {
-                //navigate to password list page
+                Navigation.PushAsync(new CredentialListPage());
             }
             else
             {
