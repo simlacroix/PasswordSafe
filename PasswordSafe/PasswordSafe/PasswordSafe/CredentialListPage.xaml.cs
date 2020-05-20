@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using PasswordSafe.Models;
 using System.Collections.ObjectModel;
+using Xamarin.Essentials;
 
 namespace PasswordSafe
 {
@@ -78,10 +79,8 @@ namespace PasswordSafe
                         await DisplayAlert("Error", "Invalid credential type", "ok");
                         break;
                 }
+                await Clipboard.SetTextAsync(string.Empty);
                 await Navigation.PushAsync(new CredentialDetailPage(newCredential, _credentials));
-            }
-            else {
-                await DisplayAlert("Error", "Invalid credential type", "ok");
             }
         }
 
@@ -136,11 +135,12 @@ namespace PasswordSafe
             }
         }
 
-        private void listViewCredentials_ItemTapped(object sender, ItemTappedEventArgs e)
+        async private void listViewCredentials_ItemTapped(object sender, ItemTappedEventArgs e)
         {
             Credential selectedCredential = e.Item as Credential;
             // edit existing credential
-            Navigation.PushAsync(new CredentialDetailPage(selectedCredential, _credentials));
+            await Clipboard.SetTextAsync(string.Empty);
+            await Navigation.PushAsync(new CredentialDetailPage(selectedCredential, _credentials));
         }
 
         async private void menuItemDelete_Clicked(object sender, EventArgs e)

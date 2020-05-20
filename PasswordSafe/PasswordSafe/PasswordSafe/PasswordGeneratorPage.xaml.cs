@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Xamarin.Essentials;
 
 namespace PasswordSafe
 {
@@ -25,14 +26,15 @@ namespace PasswordSafe
             symbols.Text = passwordPolicy.numSymbols.ToString();
         }
 
-        private void generate_Clicked(object sender, EventArgs e)
+        async private void generate_Clicked(object sender, EventArgs e)
         {
             passwordPolicy.numLowerCase = int.Parse(lower.Text);
             passwordPolicy.numUpperCase = int.Parse(upper.Text);
             passwordPolicy.numDigits = int.Parse(digits.Text);
             passwordPolicy.numSymbols = int.Parse(symbols.Text);
             string pass = passwordPolicy.GenerateRandomPassword();
-            generatedPass.Text = pass;            
+            generatedPass.Text = pass;
+            await Clipboard.SetTextAsync(pass);
         }
     }
 }
