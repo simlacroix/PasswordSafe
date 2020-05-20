@@ -74,7 +74,7 @@ namespace PasswordSafe.Models
 
         public string GetMostRecentPassword() {
             if(passwordHistory.Count!=0)
-                return passwordHistory[-1];
+                return passwordHistory[passwordHistory.Count-2];
             return "";
         }
 
