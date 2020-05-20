@@ -50,6 +50,11 @@ namespace PasswordSafe
         {
             if (credential is BankCredential bc)
             {
+                if (bc.Accounts == null)
+                    bc.Accounts = new ObservableCollection<long>();
+                if (bc.SecurityQuestions == null)
+                    bc.SecurityQuestions = new Dictionary<string, string>();
+
                 originalCredential = new BankCredential()
                 {
                     CardNumber = bc.CardNumber,
@@ -61,8 +66,8 @@ namespace PasswordSafe
                 };
 
                 // enable relevant entries
-                if(credential.ID == 0)
-                    entryCardNumber.IsEnabled = entrySecuirityCode.IsEnabled = entryAddress.IsEnabled 
+                if (credential.ID == 0)
+                    entryCardNumber.IsEnabled = entrySecuirityCode.IsEnabled = entryAddress.IsEnabled
                         = entryOnlineBankingUrl.IsEnabled = btnAddAcct.IsEnabled = btnAddQst.IsEnabled = true;
 
                 // set source of listviewQuestions and listviewAccounts
@@ -91,8 +96,10 @@ namespace PasswordSafe
                 tableRoot.Remove(bankingTbSection);
                 tableRoot.Remove(wifiTbSection);
             }
-            else if (credential is WifiCredential wc) {
-                originalCredential = new WifiCredential() {
+            else if (credential is WifiCredential wc)
+            {
+                originalCredential = new WifiCredential()
+                {
                     WifiName = wc.WifiName,
                     MacAddress = wc.MacAddress,
                     IpAddress = wc.IpAddress,
@@ -101,10 +108,16 @@ namespace PasswordSafe
                     DnsServer = wc.DnsServer
                 };
                 if (credential.ID == 0)
-                    entryWifiName.IsEnabled = entryMacAddress.IsEnabled = entryIpAddress.IsEnabled = 
-                        entrySubnetMask.IsEnabled = entryDefaultGateway.IsEnabled = entryDnsServer.IsEnabled =true;
+                    entryWifiName.IsEnabled = entryMacAddress.IsEnabled = entryIpAddress.IsEnabled =
+                        entrySubnetMask.IsEnabled = entryDefaultGateway.IsEnabled = entryDnsServer.IsEnabled = true;
 
                 tableRoot.Remove(socialMediaTbSection);
+                tableRoot.Remove(bankingTbSection);
+            }
+            else {
+                // hide irrelevant table sections when it is default credential
+                tableRoot.Remove(socialMediaTbSection);
+                tableRoot.Remove(wifiTbSection);
                 tableRoot.Remove(bankingTbSection);
             }
 
@@ -144,7 +157,7 @@ namespace PasswordSafe
 
         async private void saveBtn_Clicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(entryTitle.Text) || string.IsNullOrWhiteSpace(entryPassword.Text) || string.IsNullOrWhiteSpace(entryExpireDate.Text))
+            if (string.IsNullOrWhiteSpace(entryTitle.Text) || string.IsNullOrWhiteSpace(entryPassword.Text) || entryExpireDate.Date != null)
             {
                 await DisplayAlert("Save Error", "Please enter a title, a password and an expiration date to save credential.", "OK");
             }
@@ -166,13 +179,13 @@ namespace PasswordSafe
                     }
                 }
 
-                DateTime expiration = DateTime.Now;
+                /*DateTime expiration;
                 // expiration date entered is not a valid Datetime object
                 if (!DateTime.TryParse(entryExpireDate.Text, out expiration)) {
                     await DisplayAlert("Save Error", "Please enter a valid expire time.", "OK");
                     return;
                 }
-                credential.ExpirationDate = expiration;
+                credential.ExpirationDate = expiration;*/
 
                 // prevent OnDisappearing() from resetting credential to the original credential
                 credential.IsChanged = false;
@@ -319,9 +332,28 @@ namespace PasswordSafe
             }
         }
 
-        private void prePassBtn_Clicked(object sender, EventArgs e)
+        async private void passOperationsBtn_Clicked(object sender, EventArgs e)
         {
-            DisplayAlert("Password Recovery", "The most recent password in history for this credential is: " + (this.BindingContext as Credential).GetMostRecentPassword(), "OK");
+            string result = await DisplayActionSheet("Choose a password operation from the following:", "Cancel", null, "View most recent password", "Generate random password");
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                switch (result)
+                {
+                    case "View most recent password":
+                        await DisplayAlert("Password Recovery", "The most recent password in history for this credential is: " + (this.BindingContext as Credential).GetMostRecentPassword(), "OK");
+                        break;
+                    case "Generate random password":
+                        await Navigation.PushAsync(new PasswordGeneratorPage());
+                        break;
+                    default:
+                        await DisplayAlert("Password Operation Error", "Invalid password operation", "ok");
+                        break;
+                }
+            }
+            else
+            {
+                await DisplayAlert("Password Operation Error", "Invalid password operation", "ok");
+            }
         }
     }
 }
