@@ -7,7 +7,7 @@
              x:Class="PasswordSafe.CombinationPage"
              Title="Combination Settings">
     <ContentPage.Content>
-        <TableView BackgroundColor="Gray" x:Name="Table">
+        <TableView x:Name="Table">
             <TableRoot>
                 <TableSection x:Name="oldSection">
                     <ViewCell>

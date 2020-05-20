@@ -47,7 +47,7 @@ namespace PasswordSafe
             Credential newCredential = newCredential = new Credential();
             // create new credential
             string result = await DisplayActionSheet("Choose a credential type from the following:", "Cancel", null, Credential.credentialTypes);
-            if (!string.IsNullOrWhiteSpace(result))
+            if (!string.IsNullOrWhiteSpace(result) && result.ToLower() != "cancel")
             {
                 switch (result)
                 {

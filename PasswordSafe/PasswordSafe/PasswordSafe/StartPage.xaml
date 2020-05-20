@@ -5,7 +5,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="PasswordSafe.StartPage"
-             BackgroundColor="Gray"
              Title="Secure Password Safe">
     <ContentPage.Content>
         <StackLayout VerticalOptions="CenterAndExpand" Padding="20">
