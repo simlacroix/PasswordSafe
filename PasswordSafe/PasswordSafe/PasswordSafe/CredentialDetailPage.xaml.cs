@@ -1,9 +1,11 @@
-﻿using PasswordSafe.Models;
+﻿using Newtonsoft.Json;
+using PasswordSafe.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -48,12 +50,19 @@ namespace PasswordSafe
         }
         private void cloneCredential(Credential credential)
         {
+            ObservableCollection<long> accounts;
+            Dictionary<string, string> securityQuestions;
             if (credential is BankCredential bc)
             {
                 if (bc.Accounts == null)
-                    bc.Accounts = new ObservableCollection<long>();
+                    accounts = new ObservableCollection<long>();
+                else
+                    accounts = JsonConvert.DeserializeObject<ObservableCollection<long>>(bc.Accounts);
                 if (bc.SecurityQuestions == null)
-                    bc.SecurityQuestions = new Dictionary<string, string>();
+                    securityQuestions = new Dictionary<string, string>();
+                else
+                    securityQuestions = JsonConvert.DeserializeObject<Dictionary<string, string>>(bc.SecurityQuestions);
+
 
                 originalCredential = new BankCredential()
                 {
@@ -61,8 +70,10 @@ namespace PasswordSafe
                     SecuirityCode = bc.SecuirityCode,
                     Address = bc.Address,
                     OnlineBankingUrl = bc.OnlineBankingUrl,
-                    Accounts = new ObservableCollection<long>(bc.Accounts),
-                    SecurityQuestions = new Dictionary<string, string>(bc.SecurityQuestions)
+                    Accounts = JsonConvert.SerializeObject(accounts),
+                    //Accounts = new ObservableCollection<long>(bc.Accounts),
+                    SecurityQuestions = JsonConvert.SerializeObject(securityQuestions)
+                    //SecurityQuestions = new Dictionary<string, string>(bc.SecurityQuestions)
                 };
 
                 // enable relevant entries
@@ -71,8 +82,10 @@ namespace PasswordSafe
                         = entryOnlineBankingUrl.IsEnabled = btnAddAcct.IsEnabled = btnAddQst.IsEnabled = true;
 
                 // set source of listviewQuestions and listviewAccounts
-                listviewAccounts.ItemsSource = bc.Accounts;
-                listviewQuestions.ItemsSource = bc.SecurityQuestions;
+                if (bc.Accounts != null)
+                    listviewAccounts.ItemsSource = JsonConvert.DeserializeObject<ObservableCollection<long>>(bc.Accounts);
+                if (bc.SecurityQuestions != null)
+                    listviewQuestions.ItemsSource = JsonConvert.DeserializeObject<Dictionary<string, string>>(bc.SecurityQuestions);
 
                 // hide irrelevant table sections
                 // https://stackoverflow.com/questions/37093342/how-to-hide-or-remove-particular-tablesectionxamarin-forms-which-created-by-xa
@@ -157,7 +170,7 @@ namespace PasswordSafe
 
         async private void saveBtn_Clicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(entryTitle.Text) || string.IsNullOrWhiteSpace(entryPassword.Text) || entryExpireDate.Date != null)
+            if (string.IsNullOrWhiteSpace(entryTitle.Text) || string.IsNullOrWhiteSpace(entryPassword.Text) || entryExpireDate.Date == null)
             {
                 await DisplayAlert("Save Error", "Please enter a title, a password and an expiration date to save credential.", "OK");
             }
@@ -234,15 +247,20 @@ namespace PasswordSafe
 
         async private void menuItemDeleteAcct_Clicked(object sender, EventArgs e)
         {
-            long account = 0;
-            if (long.TryParse((sender as MenuItem).CommandParameter as string, out account))
+            ObservableCollection<long> accounts;            
+            MenuItem m = sender as MenuItem;
+            object account = m.CommandParameter as object;
+            if (account != null)
             {
                 BankCredential credential = this.BindingContext as BankCredential;
-                bool answer = await DisplayAlert("Warning", "Are you sure you want like to delete " + account + "?", "Yes", "No");
+                bool answer = await DisplayAlert("Warning", "Are you sure you want like to delete " + account.ToString() + "?", "Yes", "No");
                 if (answer)
                 {
                     // update listviewAccounts UI
-                    credential.Accounts.Remove(account);
+                    accounts = JsonConvert.DeserializeObject<ObservableCollection<long>>(credential.Accounts);
+                    accounts.Remove(long.Parse(account.ToString()));
+                    credential.Accounts = JsonConvert.SerializeObject(accounts);
+                    listviewAccounts.ItemsSource = JsonConvert.DeserializeObject<ObservableCollection<long>>(credential.Accounts);
                 }
             }
             else {
@@ -262,7 +280,10 @@ namespace PasswordSafe
                 if (answer)
                 {
                     // update listviewAccounts UI
-                    credential.SecurityQuestions.Remove(pair.Key);
+                    Dictionary<string, string> securityQuestions = JsonConvert.DeserializeObject<Dictionary<string, string>>(credential.SecurityQuestions);
+                    securityQuestions.Remove(pair.Key);
+                    credential.SecurityQuestions = JsonConvert.SerializeObject(securityQuestions);
+                    listviewQuestions.ItemsSource = JsonConvert.DeserializeObject<Dictionary<string, string>>(credential.SecurityQuestions);
                     //todo!! Do we need to update the ui if implement IPropertyChange on SecurityQuestions in Credential class
                 }
             }
@@ -272,7 +293,9 @@ namespace PasswordSafe
         }
         private void menuItemModifyAcct_Clicked(object sender, EventArgs e)
         {
-            addModifyAccount(false);
+            MenuItem m = sender as MenuItem;
+            object account = m.CommandParameter as object;
+            addModifyAccount(false,account.ToString());
         }
         private void btnAddAcct_Clicked(object sender, EventArgs e)
         {
@@ -280,7 +303,9 @@ namespace PasswordSafe
         }
         private void menuItemModifyQst_Clicked(object sender, EventArgs e)
         {
-            addModifyQuestionAnswer();
+            MenuItem m = sender as MenuItem;
+            object qq = m.CommandParameter as object;            
+            addModifyQuestionAnswer(true,qq.ToString());
         }
 
         private void btnAddQst_Clicked(object sender, EventArgs e)
@@ -288,12 +313,29 @@ namespace PasswordSafe
             addModifyQuestionAnswer();
         }
 
-        async private void addModifyQuestionAnswer(string question="",string answer="") {
+        async private void addModifyQuestionAnswer(bool modify=false,string oldQuestion="", string question="",string answer="") {
             question = await DisplayPromptAsync("Add Question", "Please enter security question below \n(previous value: "+question+")");
             answer = await DisplayPromptAsync("Add Answer", "Please enter answer to the security question below \n(previous value: " + answer + ")");
+
+            Dictionary<string, string> securityQuestions;
+
+            if ((this.BindingContext as BankCredential).SecurityQuestions != null)
+                securityQuestions = JsonConvert.DeserializeObject<Dictionary<string, string>>((this.BindingContext as BankCredential).SecurityQuestions);
+            else
+                securityQuestions = new Dictionary<string, string>();
+
             if (!string.IsNullOrWhiteSpace(question) && !string.IsNullOrWhiteSpace(answer))
             {
-                (this.BindingContext as BankCredential).SecurityQuestions.Add(question, answer);
+                if (modify)
+                {
+                    oldQuestion = oldQuestion.Split(',')[0].Remove(0, 1);
+                    securityQuestions.Remove(oldQuestion);
+                }
+                    
+
+                securityQuestions.Add(question, answer);
+                (this.BindingContext as BankCredential).SecurityQuestions = JsonConvert.SerializeObject(securityQuestions);
+                listviewQuestions.ItemsSource = JsonConvert.DeserializeObject<Dictionary<string, string>>((this.BindingContext as BankCredential).SecurityQuestions);
             }
             else
             {
@@ -304,17 +346,24 @@ namespace PasswordSafe
         async private void addModifyAccount(bool isAdd=true, string result="") {
             BankCredential bc = this.BindingContext as BankCredential;
             int index = -1;
-            if (!isAdd) {
-                index = bc.Accounts.IndexOf(long.Parse(result));
+            ObservableCollection<long> accounts;
+            if (bc.Accounts != null)
+                accounts = JsonConvert.DeserializeObject<ObservableCollection<long>>(bc.Accounts);
+            else
+                accounts = new ObservableCollection<long>();
+            if (!isAdd) {                
+                index = accounts.IndexOf(long.Parse(result));
             }
 
             result = await DisplayPromptAsync("Add Account", "Please enter new account number below (previous value: "+result+")", keyboard: Keyboard.Numeric);
             if (long.TryParse(result, out long newAccount))
             {
                 if (isAdd)
-                    bc.Accounts.Add(newAccount);
+                    accounts.Add(newAccount);
                 else
-                    bc.Accounts[index] = newAccount;          
+                    accounts[index] = newAccount;
+                bc.Accounts = JsonConvert.SerializeObject(accounts);
+                listviewAccounts.ItemsSource = JsonConvert.DeserializeObject<ObservableCollection<long>>(bc.Accounts);
             }
             else
             {

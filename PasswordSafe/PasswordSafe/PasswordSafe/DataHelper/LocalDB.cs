@@ -21,7 +21,7 @@ namespace PasswordSafe
             _database = new SQLiteAsyncConnection(connectionString);
             _database.CreateTableAsync<Credential>().Wait();
             _database.CreateTableAsync<WifiCredential>().Wait();
-            //_database.CreateTableAsync<BankCredential>().Wait();
+            _database.CreateTableAsync<BankCredential>().Wait();
             _database.CreateTableAsync<SocialMediaCredential>().Wait();
         }
 
