@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Xamarin.Essentials;
 
 namespace PasswordSafe
 {
@@ -129,6 +130,20 @@ namespace PasswordSafe
             originalCredential.IsChanged = false;
         }
 
+        async protected override void OnAppearing()
+        {
+            // paste the random password generated in PasswordGenerator Page to entryPassword
+            if (Clipboard.HasText) { 
+                string text = await Clipboard.GetTextAsync();
+                if (!string.IsNullOrWhiteSpace(text)) {
+                    entryPassword.Text = text;
+                    await DisplayAlert("Generate Password", "We have pasted the random password to password entry.", "OK");
+                    await Clipboard.SetTextAsync(string.Empty);
+                }
+            }
+            base.OnAppearing();
+        }
+
         private void toolbarItemEdit_Clicked(object sender, EventArgs e)
         {
             // enable or diable form entries accordingly
@@ -208,14 +223,7 @@ namespace PasswordSafe
 
                 // Navigate back to CredentialListPage
                 await Navigation.PopAsync();
-
             }
-        }
-
-        protected override bool OnBackButtonPressed()
-        {
-            Navigation.PopAsync();
-            return false;
         }
 
         protected override void OnDisappearing()
@@ -229,6 +237,7 @@ namespace PasswordSafe
                 int index = listviewCredentialsSource.IndexOf(credential);
                 listviewCredentialsSource[index] = originalCredential;
             }
+            Console.WriteLine(Navigation.NavigationStack.Count);
             base.OnDisappearing();
         }
 
@@ -334,8 +343,8 @@ namespace PasswordSafe
 
         async private void passOperationsBtn_Clicked(object sender, EventArgs e)
         {
-            string result = await DisplayActionSheet("Choose a password operation from the following:", "Cancel", null, "View most recent password", "Generate random password");
-            if (!string.IsNullOrWhiteSpace(result))
+            string result = await DisplayActionSheet("Choose a password operation from the following:", "Cancel", null, "Copy password to clipboard", "View most recent password", "Generate random password");
+            if (!string.IsNullOrWhiteSpace(result) && result.ToLower() != "cancel")
             {
                 switch (result)
                 {
@@ -345,14 +354,30 @@ namespace PasswordSafe
                     case "Generate random password":
                         await Navigation.PushAsync(new PasswordGeneratorPage());
                         break;
+                    case "Copy password to clipboard":
+                        copyToClipBoard(entryPassword.Text);
+                        break;
                     default:
                         await DisplayAlert("Password Operation Error", "Invalid password operation", "ok");
                         break;
                 }
             }
-            else
-            {
-                await DisplayAlert("Password Operation Error", "Invalid password operation", "ok");
+        }
+
+        private void menuItemCopyAcct_Clicked(object sender, EventArgs e)
+        {
+            copyToClipBoard((sender as MenuItem).CommandParameter as string,"Account Number");
+        }
+
+        private void entryCardNumber_Tapped(object sender, EventArgs e)
+        {
+            copyToClipBoard(entryCardNumber.Text,"Card Number");
+        }
+
+        async private void copyToClipBoard(string text,string entryType="Password") {
+            if (!string.IsNullOrWhiteSpace(text)) {
+                await Clipboard.SetTextAsync(text);
+                await DisplayAlert("Clipboard", string.Format("{0} {1} is copied to clipboard.",entryType,text), "OK");
             }
         }
     }
