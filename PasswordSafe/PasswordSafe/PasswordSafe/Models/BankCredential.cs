@@ -63,8 +63,8 @@ namespace PasswordSafe.Models
             }
         }
 
-        private ObservableCollection<long> _accounts;
-        public ObservableCollection<long> Accounts
+        private string _accounts;
+        public string Accounts
         {
             get { return _accounts; }
             set
@@ -77,8 +77,8 @@ namespace PasswordSafe.Models
             }
         }
 
-        private Dictionary<string, string> _securityQuestions;
-        public Dictionary<string, string> SecurityQuestions
+        private string _securityQuestions;
+        public string SecurityQuestions
         {
             get { return _securityQuestions; }
             set

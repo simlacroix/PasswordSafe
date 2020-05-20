@@ -32,12 +32,12 @@ namespace PasswordSafe
         {
             _credentials = new ObservableCollection<Credential>(await App.Database.GetAllCredentialsAsync());
             
-            //ObservableCollection<Credential> bank = new ObservableCollection<Credential>(await App.Database.GetAllBankCredentialsAsync());
+            ObservableCollection<Credential> bank = new ObservableCollection<Credential>(await App.Database.GetAllBankCredentialsAsync());
             ObservableCollection<Credential> wifi = new ObservableCollection<Credential>(await App.Database.GetAllWifiCredentialsAsync());
             ObservableCollection<Credential> social = new ObservableCollection<Credential>(await App.Database.GetAllSocialMediaCredentialsAsync());
 
-            //foreach (Credential c in bank)
-            //    _credentials.Add(c);
+            foreach (Credential c in bank)
+                _credentials.Add(c);
             foreach (Credential c in wifi)
                 _credentials.Add(c);
             foreach (Credential c in social)
