@@ -30,6 +30,18 @@ namespace PasswordSafe
         async private void populateListviewCredentials()
         {
             _credentials = new ObservableCollection<Credential>(await App.Database.GetAllCredentialsAsync());
+            
+            //ObservableCollection<Credential> bank = new ObservableCollection<Credential>(await App.Database.GetAllBankCredentialsAsync());
+            ObservableCollection<Credential> wifi = new ObservableCollection<Credential>(await App.Database.GetAllWifiCredentialsAsync());
+            ObservableCollection<Credential> social = new ObservableCollection<Credential>(await App.Database.GetAllSocialMediaCredentialsAsync());
+
+            //foreach (Credential c in bank)
+            //    _credentials.Add(c);
+            foreach (Credential c in wifi)
+                _credentials.Add(c);
+            foreach (Credential c in social)
+                _credentials.Add(c);
+
             // populate the listViewCredentials here too, double insurance if sortPicker_SelectedIndexChanged
             // happens before GetAllCredentialsAsync() gets back the contacts from database
             listViewCredentials.ItemsSource = _credentials;
