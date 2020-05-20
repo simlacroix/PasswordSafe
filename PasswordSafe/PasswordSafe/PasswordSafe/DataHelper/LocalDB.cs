@@ -1,4 +1,5 @@
-﻿using PasswordSafe.Models;
+﻿using Microsoft.Data.Sqlite;
+using PasswordSafe.Models;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -10,16 +11,19 @@ namespace PasswordSafe
     public class LocalDB
     {
         //Connection to the SQLite DB
-        private readonly SQLiteAsyncConnection _database;
+        private readonly SQLiteAsyncConnection _database;        
 
         public LocalDB(string dbPath)
         {
-            _database = new SQLiteAsyncConnection(dbPath);
+            //this connection string will encrpyt the database with a keyword
+            SQLiteConnectionString connectionString = new SQLiteConnectionString(dbPath, true, "combination");
+
+            _database = new SQLiteAsyncConnection(connectionString);
             _database.CreateTableAsync<Credential>().Wait();
         }
 
         public Task<List<Credential>> GetAllCredentialsAsync()
-        {
+        {            
             return _database.Table<Credential>().ToListAsync();
         }
 

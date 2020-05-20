@@ -28,10 +28,13 @@ namespace PasswordSafe.Models
             numDigits = 4;
             numSymbols = 3;
         }
+               
 
         public void AddCustomSymbols(char symbol)
         {
-            symbols.Add(symbol);
+            //make sure the list doesnt already contain the symbol
+            if (!symbols.Contains(symbol))
+                symbols.Add(symbol);
         }
 
         // https://www.csharp-console-examples.com/loop/c-shuffle-list/
@@ -54,7 +57,7 @@ namespace PasswordSafe.Models
         }
 
         // http://csharp.net-informations.com/string/random.htm
-        public List<string> RandomSymbol() {
+        private List<string> RandomSymbol() {
             List<string> symbolsCollection = new List<string>();
             for (int i = 0; i < numSymbols; i++)
             {
@@ -64,7 +67,7 @@ namespace PasswordSafe.Models
             return symbolsCollection;
         }
 
-        public List<string> RandomNumber() {
+        private List<string> RandomNumber() {
             List<string> numbers = new List<string>();
             for (int i = 0; i < numDigits; i++) {
                 numbers.Add(random.Next(0,10).ToString());
@@ -74,7 +77,7 @@ namespace PasswordSafe.Models
 
         // Generate a random string with a given size  
         // https://www.c-sharpcorner.com/article/generating-random-number-and-string-in-C-Sharp/
-        public List<string> RandomString(int size, bool lowerCase)
+        private List<string> RandomString(int size, bool lowerCase)
         {
             List<string> letters = new List<string>();
             char ch;
