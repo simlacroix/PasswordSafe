@@ -34,7 +34,7 @@ namespace PasswordSafe
             if (credential.ID == 0)
             {
                 isNewCredential = true;
-                Title = "New Contact";
+                Title = "New Credential";
                 // hide edit on tool bar when it is new credential
                 toolbarItemEdit.Text = "";
                 toolbarItemEdit.IsEnabled = false;
@@ -132,15 +132,15 @@ namespace PasswordSafe
         private void toolbarItemEdit_Clicked(object sender, EventArgs e)
         {
             // enable or diable form entries accordingly
-            if (this.Title == "Contact")
+            if (this.Title == "Credential")
             {
-                this.Title = "Edit Contact";
+                this.Title = "Edit Credential";
                 saveBtn.IsVisible = entryTitle.IsEnabled = entryPassword.IsEnabled = entryExpireDate.IsEnabled = entryNotes.IsEnabled = true;
                 switchEnablity(true);
             }
             else
             {
-                this.Title = "Contact";
+                this.Title = "Credential";
                 saveBtn.IsVisible = entryTitle.IsEnabled = entryPassword.IsEnabled = entryExpireDate.IsEnabled = entryNotes.IsEnabled = false;
                 switchEnablity(false);
             }
@@ -169,7 +169,7 @@ namespace PasswordSafe
                 {
                     // Check if email is in valid format
                     // Source: https://docs.microsoft.com/en-us/dotnet/standard/base-types/how-to-verify-that-strings-are-in-valid-email-format
-                    if (!Regex.IsMatch(smc.Email,
+                    if (smc.Email != null && !Regex.IsMatch(smc.Email,
                     @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
                     @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
                     RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250)))
