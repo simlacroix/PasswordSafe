@@ -29,7 +29,7 @@ namespace PasswordSafe
 
         async private void populateListviewCredentials()
         {
-            _credentials = new ObservableCollection<Credential>(await App.Database.GetAllUsersAsync());
+            _credentials = new ObservableCollection<Credential>(await App.Database.GetAllCredentialsAsync());
             // populate the listViewCredentials here too, double insurance if sortPicker_SelectedIndexChanged
             // happens before GetAllCredentialsAsync() gets back the contacts from database
             listViewCredentials.ItemsSource = _credentials;
@@ -137,7 +137,7 @@ namespace PasswordSafe
             bool answer = await DisplayAlert("Warning", "Are you sure you want like to delete " + credential.CredentialTitle + "?", "Yes", "No");
             if (answer)
             {
-                await App.Database.DeleteUserAsync(credential);
+                await App.Database.DeleteCredentialAsync(credential);
                 // update ListviewCredentials UI
                 _credentials.Remove(credential);
             }
