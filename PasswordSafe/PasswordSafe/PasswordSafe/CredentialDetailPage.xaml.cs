@@ -19,9 +19,18 @@ namespace PasswordSafe
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CredentialDetailPage : ContentPage
     {
+        private const int CVC_DIGITS = 3;
+        private const int CARD_NUM_DIGITS = 16;
+        private const string EMAIL_REGEX = @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
+                    @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$";
+        private const string PHONE_REGEX = @"[^0-9]+";
+        private const int PHONE_DIGITS = 10;
+
+
         private bool isNewCredential = false;
         private ObservableCollection<Credential> listviewCredentialsSource;
         private Credential originalCredential = new Credential();
+        private List<string> passwordHistoryList = new List<string>();
 
         public CredentialDetailPage(Credential credential, ObservableCollection<Credential> credentials)
         {
@@ -41,7 +50,7 @@ namespace PasswordSafe
                 // hide edit on tool bar when it is new credential
                 toolbarItemEdit.Text = "";
                 toolbarItemEdit.IsEnabled = false;
-                saveBtn.IsVisible = entryTitle.IsEnabled = entryPassword.IsEnabled = entryExpireDate.IsEnabled = entryNotes.IsEnabled =  true;
+                saveBtn.IsVisible = entryTitle.IsEnabled = entryPassword.IsEnabled = entryExpireDate.IsEnabled = entryNotes.IsEnabled = passOperationsBtn.IsEnabled =  true;
             }
             else
             {
@@ -141,6 +150,10 @@ namespace PasswordSafe
             originalCredential.Notes = credential.Notes;
             originalCredential.ID = credential.ID;
             originalCredential.IsChanged = false;
+            originalCredential.PasswordHistory = credential.PasswordHistory;
+            
+            if(!string.IsNullOrWhiteSpace(credential.PasswordHistory))
+                passwordHistoryList = JsonConvert.DeserializeObject<List<string>>(credential.PasswordHistory);
         }
 
         async protected override void OnAppearing()
@@ -163,13 +176,13 @@ namespace PasswordSafe
             if (this.Title == "Credential")
             {
                 this.Title = "Edit Credential";
-                saveBtn.IsVisible = entryTitle.IsEnabled = entryPassword.IsEnabled = entryExpireDate.IsEnabled = entryNotes.IsEnabled = true;
+                saveBtn.IsVisible = entryTitle.IsEnabled = entryPassword.IsEnabled = entryExpireDate.IsEnabled = entryNotes.IsEnabled = passOperationsBtn.IsEnabled = true;
                 switchEnablity(true);
             }
             else
             {
                 this.Title = "Credential";
-                saveBtn.IsVisible = entryTitle.IsEnabled = entryPassword.IsEnabled = entryExpireDate.IsEnabled = entryNotes.IsEnabled = false;
+                saveBtn.IsVisible = entryTitle.IsEnabled = entryPassword.IsEnabled = entryExpireDate.IsEnabled = entryNotes.IsEnabled = passOperationsBtn.IsEnabled = false;
                 switchEnablity(false);
             }
         }
@@ -197,26 +210,46 @@ namespace PasswordSafe
                 {
                     // Check if email is in valid format
                     // Source: https://docs.microsoft.com/en-us/dotnet/standard/base-types/how-to-verify-that-strings-are-in-valid-email-format
-                    if (smc.Email != null && !Regex.IsMatch(smc.Email,
-                    @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
-                    @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
-                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250)))
+                    if (!string.IsNullOrWhiteSpace(smc.Email) && !Regex.IsMatch(smc.Email, EMAIL_REGEX, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250)))
                     {
-                        await DisplayAlert("Save Error", "Please enter a title, a password and an expiration date to save credential.", "OK");
+                        await DisplayAlert("Save Error", "Please enter a valid email address.", "OK");
+                        return;
+                    }
+
+                    // validate if phone number has 10 digits
+                    // https://stackoverflow.com/questions/29970244/how-to-validate-a-phone-number
+                    // https://stackoverflow.com/a/44283376
+                    if (!string.IsNullOrWhiteSpace(smc.PhoneNumber) && Regex.Replace(smc.PhoneNumber, PHONE_REGEX, "").Length != PHONE_DIGITS) {
+                        await DisplayAlert("Save Error", "Please enter a valid phone number (10 digits).", "OK");
+                        return;
+                    }
+                }
+                else if (credential is BankCredential bc) {
+                    if (bc.SecuirityCode.ToString().Length > CVC_DIGITS) {
+                        await DisplayAlert("Save Error", "Please enter a valid 3-digit security code (credit card verification code).", "OK");
+                        return;
+                    }
+                    if (bc.CardNumber.ToString().Length > CARD_NUM_DIGITS) {
+                        await DisplayAlert("Save Error", "Please enter a valid 16-digit card number.", "OK");
                         return;
                     }
                 }
 
-                /*DateTime expiration;
                 // expiration date entered is not a valid Datetime object
-                if (!DateTime.TryParse(entryExpireDate.Text, out expiration)) {
+                if (entryExpireDate.Date <= DateTime.Now) {
                     await DisplayAlert("Save Error", "Please enter a valid expire time.", "OK");
                     return;
                 }
-                credential.ExpirationDate = expiration;*/
 
                 // prevent OnDisappearing() from resetting credential to the original credential
                 credential.IsChanged = false;
+
+                // update password history with the newest password
+                if (!passwordHistoryList.Contains(credential.Password))
+                {
+                    passwordHistoryList.Add(credential.Password);
+                    credential.PasswordHistory = JsonConvert.SerializeObject(passwordHistoryList);
+                }
 
                 // save the id of credential for new credential
                 int primaryKey = await App.Database.SaveCredentialAsync(credential);
@@ -229,10 +262,6 @@ namespace PasswordSafe
                     // Add contact to ui.
                     listviewCredentialsSource.Add(credential);
                 }
-
-                // update password history with the newest password
-                if (!credential.GetPasswordHistory().Contains(credential.Password))
-                    credential.GetPasswordHistory().Add(credential.Password);
 
                 // Navigate back to CredentialListPage
                 await Navigation.PopAsync();
@@ -288,7 +317,7 @@ namespace PasswordSafe
                 bool answer = await DisplayAlert("Warning", "Are you sure you want like to delete \n'Q: " + pair.Key + " A: " + pair.Value + "'?", "Yes", "No");
                 if (answer)
                 {
-                    // update listviewAccounts UI
+                    // update listviewQuestions UI
                     Dictionary<string, string> securityQuestions = JsonConvert.DeserializeObject<Dictionary<string, string>>(credential.SecurityQuestions);
                     securityQuestions.Remove(pair.Key);
                     credential.SecurityQuestions = JsonConvert.SerializeObject(securityQuestions);
@@ -398,7 +427,11 @@ namespace PasswordSafe
                 switch (result)
                 {
                     case "View most recent password":
-                        await DisplayAlert("Password Recovery", "The most recent password in history for this credential is: " + (this.BindingContext as Credential).GetMostRecentPassword(), "OK");
+                        string prePassword = "N/A";
+                        if (passwordHistoryList.Count > 1) {
+                            prePassword = passwordHistoryList[passwordHistoryList.Count-2];
+                        }
+                        await DisplayAlert("Password Recovery", "The most recent password in history for this credential is: " + prePassword, "OK");
                         break;
                     case "Generate random password":
                         await Navigation.PushAsync(new PasswordGeneratorPage());

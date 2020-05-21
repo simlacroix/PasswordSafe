@@ -80,6 +80,7 @@ namespace PasswordSafe
                         break;
                 }
                 await Clipboard.SetTextAsync(string.Empty);
+                searchBar.Text = string.Empty;
                 await Navigation.PushAsync(new CredentialDetailPage(newCredential, _credentials));
             }
         }
@@ -93,8 +94,14 @@ namespace PasswordSafe
             }
             else
             {
-                listViewCredentials.ItemsSource = _credentials.Where(c => c.CredentialTitle.ToLower().Contains(filter) || c.Notes.ToLower().Contains(filter) ||
-                    c.ExpirationDate.ToString("F").ToLower().Contains(filter));
+                ObservableCollection<Credential> filteredCredentials = new ObservableCollection<Credential>();
+                foreach (Credential c in _credentials) {
+                    if (c.CredentialTitle.ToLower().Contains(filter) || c.ExpirationDate.ToString("F").ToLower().Contains(filter)
+                        || (!string.IsNullOrWhiteSpace(c.Notes) && c.Notes.ToLower().Contains(filter))) {
+                        filteredCredentials.Add(c);
+                    }
+                }
+                listViewCredentials.ItemsSource = filteredCredentials;
             }
         }
 
@@ -140,6 +147,7 @@ namespace PasswordSafe
             Credential selectedCredential = e.Item as Credential;
             // edit existing credential
             await Clipboard.SetTextAsync(string.Empty);
+            searchBar.Text = string.Empty;
             await Navigation.PushAsync(new CredentialDetailPage(selectedCredential, _credentials));
         }
 
