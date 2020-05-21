@@ -70,17 +70,7 @@ namespace PasswordSafe.Models
             }
         }
 
-        private List<string> passwordHistory = new List<string>();
-
-        public string GetMostRecentPassword() {
-            if(passwordHistory.Count!=0)
-                return passwordHistory[passwordHistory.Count-2];
-            return "";
-        }
-
-        public List<string> GetPasswordHistory() {
-            return passwordHistory;
-        }
+        public string PasswordHistory { get; set; }
 
         public bool IsChanged { get; set; }
 
