@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PasswordSafe.DataHelper
 {
@@ -40,9 +41,13 @@ namespace PasswordSafe.DataHelper
                 return true;
         }
 
-        public void ChangePass(string pass)
+        public bool ChangePass(string pass)
         {
+            if (pass.Length < 6 || !Regex.IsMatch(pass, "[A-Z]") || !Regex.IsMatch(pass, "[a-z]") || !Regex.IsMatch(pass, "[+,-,=,_,@,#,$,%,^,&,*,(,),{,},;,:,\',?,!]") || !Regex.IsMatch(pass, "[0-9]"))
+                return false;
+
             File.WriteAllText(FileName, Hash(pass));
+            return true;
         }
 
         // hashing method found here: https://stackoverflow.com/questions/4181198/how-to-hash-a-password/10402129#10402129 
