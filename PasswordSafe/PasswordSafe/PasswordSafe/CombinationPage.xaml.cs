@@ -45,10 +45,20 @@ namespace PasswordSafe
             }
             
             if (theNew.Text == confirm.Text && !String.IsNullOrWhiteSpace(theNew.Text))
-            {
-                await DisplayAlert("Confirmed", "Combination was successfully changed", "ok");
-                App.PassOperations.ChangePass(theNew.Text);
-                await Navigation.PopAsync();
+            {                
+                if (App.PassOperations.ChangePass(theNew.Text))
+                {
+                    await DisplayAlert("Confirmed", "Combination was successfully changed", "ok");
+                    await Navigation.PopAsync();
+                }
+                    
+                else
+                {
+                    await DisplayAlert("Error", "Combination is not complex enough. Must be at least 6 char long, have one uppercase, have one lowercase one number and one symbol", "ok");
+                    theNew.Text = string.Empty;
+                    confirm.Text = string.Empty;
+                }
+                    
             }
             else
             {
