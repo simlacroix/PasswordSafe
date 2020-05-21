@@ -25,7 +25,9 @@ namespace PasswordSafe
                     @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$";
         private const string PHONE_REGEX = @"[^0-9]+";
         private const int PHONE_DIGITS = 10;
-
+        private const int NUM_OCTETS = 4;
+        private const int OCT_MIN = 0;
+        private const int OCT_MAX = 255;
 
         private bool isNewCredential = false;
         private ObservableCollection<Credential> listviewCredentialsSource;
@@ -219,18 +221,25 @@ namespace PasswordSafe
                     // validate if phone number has 10 digits
                     // https://stackoverflow.com/questions/29970244/how-to-validate-a-phone-number
                     // https://stackoverflow.com/a/44283376
-                    if (!string.IsNullOrWhiteSpace(smc.PhoneNumber) && Regex.Replace(smc.PhoneNumber, PHONE_REGEX, "").Length != PHONE_DIGITS) {
+                    if (!string.IsNullOrWhiteSpace(smc.PhoneNumber) && (Regex.Replace(smc.PhoneNumber, PHONE_REGEX, "").Length < PHONE_DIGITS || Regex.Replace(smc.PhoneNumber, PHONE_REGEX, "").Length > PHONE_DIGITS + 3)) {
                         await DisplayAlert("Save Error", "Please enter a valid phone number (10 digits).", "OK");
                         return;
                     }
                 }
                 else if (credential is BankCredential bc) {
-                    if (bc.SecuirityCode.ToString().Length > CVC_DIGITS) {
+                    if (bc.SecuirityCode.ToString().Length != CVC_DIGITS) {
                         await DisplayAlert("Save Error", "Please enter a valid 3-digit security code (credit card verification code).", "OK");
                         return;
                     }
-                    if (bc.CardNumber.ToString().Length > CARD_NUM_DIGITS) {
+                    if (bc.CardNumber.ToString().Length != CARD_NUM_DIGITS) {
                         await DisplayAlert("Save Error", "Please enter a valid 16-digit card number.", "OK");
+                        return;
+                    }
+                }
+                else if (credential is WifiCredential wc) {
+                    if (!isIPValid(entryDnsServer.Text) || !isIPValid(entryDefaultGateway.Text) 
+                        || !isIPValid(entryIpAddress.Text) || !isIPValid(entrySubnetMask.Text)) {
+                        await DisplayAlert("Save Error", "Please enter valid IP address (e.g. 10.39.167.52).", "OK");
                         return;
                     }
                 }
@@ -266,6 +275,25 @@ namespace PasswordSafe
                 // Navigate back to CredentialListPage
                 await Navigation.PopAsync();
             }
+        }
+
+        private bool isIPValid(string entryText) {
+            if (string.IsNullOrWhiteSpace(entryText)) {
+                return true;
+            }
+
+            // https://stackoverflow.com/questions/5096780/ip-address-validation
+            string[] octets = entryText.Split('.');
+            if (octets.Length != NUM_OCTETS) {
+                return false;
+            }
+            foreach (string oct in octets) {
+                if (!int.TryParse(oct, out int octValue))
+                    return false;
+                if (octValue < OCT_MIN || octValue > OCT_MAX)
+                    return false;
+            }
+            return true;
         }
 
         protected override void OnDisappearing()
