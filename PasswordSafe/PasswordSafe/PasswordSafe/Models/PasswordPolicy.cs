@@ -28,14 +28,6 @@ namespace PasswordSafe.Models
             numDigits = 4;
             numSymbols = 3;
         }
-               
-
-        public void AddCustomSymbols(char symbol)
-        {
-            //make sure the list doesnt already contain the symbol
-            if (!symbols.Contains(symbol))
-                symbols.Add(symbol);
-        }
 
         // https://www.csharp-console-examples.com/loop/c-shuffle-list/
         public string GenerateRandomPassword() {

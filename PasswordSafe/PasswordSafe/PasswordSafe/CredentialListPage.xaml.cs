@@ -44,7 +44,7 @@ namespace PasswordSafe
                 _credentials.Add(c);
 
             // populate the listViewCredentials here too, double insurance if sortPicker_SelectedIndexChanged
-            // happens before GetAllCredentialsAsync() gets back the contacts from database
+            // happens before GetAllCredentialsAsync() gets back the credentials from database
             listViewCredentials.ItemsSource = _credentials;
         }
 
