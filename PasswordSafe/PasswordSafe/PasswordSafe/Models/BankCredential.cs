@@ -22,7 +22,7 @@ namespace PasswordSafe.Models
         }
 
         private int _securityCode;
-        public int SecuirityCode
+        public int SecurityCode
         {
             get { return _securityCode; }
             set
@@ -31,7 +31,7 @@ namespace PasswordSafe.Models
                     return;
 
                 _securityCode = value;
-                OnPropertyChanged(nameof(SecuirityCode));
+                OnPropertyChanged(nameof(SecurityCode));
             }
         }
 

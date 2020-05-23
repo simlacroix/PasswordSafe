@@ -79,7 +79,7 @@ namespace PasswordSafe
                 originalCredential = new BankCredential()
                 {
                     CardNumber = bc.CardNumber,
-                    SecuirityCode = bc.SecuirityCode,
+                    SecurityCode = bc.SecurityCode,
                     Address = bc.Address,
                     OnlineBankingUrl = bc.OnlineBankingUrl,
                     Accounts = JsonConvert.SerializeObject(accounts),
@@ -88,7 +88,7 @@ namespace PasswordSafe
 
                 // enable relevant entries
                 if (credential.ID == 0)
-                    entryCardNumber.IsEnabled = entrySecuirityCode.IsEnabled = entryAddress.IsEnabled
+                    entryCardNumber.IsEnabled = entrySecurityCode.IsEnabled = entryAddress.IsEnabled
                         = entryOnlineBankingUrl.IsEnabled = btnAddAcct.IsEnabled = btnAddQst.IsEnabled = true;
 
                 // set source of listviewQuestions and listviewAccounts
@@ -189,7 +189,7 @@ namespace PasswordSafe
 
         private void switchEnablity(bool isEnabledValue) {
             if (originalCredential is BankCredential)
-                entryCardNumber.IsEnabled = entrySecuirityCode.IsEnabled = entryAddress.IsEnabled = entryOnlineBankingUrl.IsEnabled = btnAddAcct.IsEnabled = btnAddQst.IsEnabled = isEnabledValue;
+                entryCardNumber.IsEnabled = entrySecurityCode.IsEnabled = entryAddress.IsEnabled = entryOnlineBankingUrl.IsEnabled = btnAddAcct.IsEnabled = btnAddQst.IsEnabled = isEnabledValue;
             else if (originalCredential is SocialMediaCredential)
                 entryEmail.IsEnabled = entryPhone.IsEnabled = entryUsername.IsEnabled = entryName.IsEnabled = entryLink.IsEnabled = isEnabledValue;
             else if(originalCredential is WifiCredential)
@@ -225,11 +225,17 @@ namespace PasswordSafe
                     }
                 }
                 else if (credential is BankCredential bc) {
-                    if (bc.SecuirityCode.ToString().Length != CVC_DIGITS) {
+                    // prevent the scenario user clicks save button too fast so that IPorpertyChanged isn't updated yet
+                    if (entrySecurityCode.Text != bc.SecurityCode.ToString())
+                        bc.SecurityCode = 0;
+                    if (entryCardNumber.Text != bc.CardNumber.ToString())
+                        bc.CardNumber = 0;
+
+                    if (bc.SecurityCode != 0 && (bc.SecurityCode.ToString().Length != CVC_DIGITS)) {
                         await DisplayAlert("Save Error", "Please enter a valid 3-digit security code (credit card verification code).", "OK");
                         return;
                     }
-                    if (bc.CardNumber.ToString().Length != CARD_NUM_DIGITS) {
+                    if (bc.CardNumber != 0 && (bc.CardNumber.ToString().Length != CARD_NUM_DIGITS)) {
                         await DisplayAlert("Save Error", "Please enter a valid 16-digit card number.", "OK");
                         return;
                     }

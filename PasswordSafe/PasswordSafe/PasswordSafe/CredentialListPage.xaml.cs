@@ -45,13 +45,15 @@ namespace PasswordSafe
 
             // populate the listViewCredentials here too, double insurance if sortPicker_SelectedIndexChanged
             // happens before GetAllCredentialsAsync() gets back the credentials from database
-            listViewCredentials.ItemsSource = _credentials;
+            if(sortKeyword != "Expiration Date ↑" && sortKeyword != "Credential Title ↓")
+                listViewCredentials.ItemsSource = _credentials;
         }
 
         protected override void OnAppearing()
         {
             // sort list each time after navigation
-            sortList();
+            if(sortKeyword != "Default")
+                sortList();
             base.OnAppearing();
         }
 
@@ -110,7 +112,7 @@ namespace PasswordSafe
             sortKeyword = (sender as Picker).SelectedItem.ToString();
             sortList();
         }
-        private void sortList()
+        async private void sortList()
         {
             // prevent sortPicker.SelectedItem = sortKeyword = "Default"; & sortList() call in OnAppearing from 
             // sorting _credentials before the _credentials gets populated from database
@@ -119,14 +121,26 @@ namespace PasswordSafe
                 switch (sortKeyword)
                 {
                     case "Credential Title ↓":
+                        populateListviewCredentials();
                         _credentials = new ObservableCollection<Credential>(_credentials.OrderBy(n => n.CredentialTitle));
                         break;
                     case "Expiration Date ↑":
+                        populateListviewCredentials();
                         _credentials = new ObservableCollection<Credential>(_credentials.OrderBy(n => n.ExpirationDate));
+                        break;
+                    case "Banking only":
+                        _credentials = new ObservableCollection<Credential>(await App.Database.GetAllBankCredentialsAsync());
+                        break;
+                    case "Social Media only":
+                        _credentials = new ObservableCollection<Credential>(await App.Database.GetAllSocialMediaCredentialsAsync());
+                        break;
+                    case "Wifi only":
+                        _credentials = new ObservableCollection<Credential>(await App.Database.GetAllWifiCredentialsAsync());
                         break;
                     case "Default":
                         searchBar.Placeholder = "Search...";
                         searchBar.IsEnabled = true;
+                        populateListviewCredentials();
                         break;
                 }
 
