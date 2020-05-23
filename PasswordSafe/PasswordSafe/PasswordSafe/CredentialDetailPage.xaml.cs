@@ -83,9 +83,7 @@ namespace PasswordSafe
                     Address = bc.Address,
                     OnlineBankingUrl = bc.OnlineBankingUrl,
                     Accounts = JsonConvert.SerializeObject(accounts),
-                    //Accounts = new ObservableCollection<long>(bc.Accounts),
                     SecurityQuestions = JsonConvert.SerializeObject(securityQuestions)
-                    //SecurityQuestions = new Dictionary<string, string>(bc.SecurityQuestions)
                 };
 
                 // enable relevant entries
@@ -265,10 +263,10 @@ namespace PasswordSafe
 
                 if (isNewCredential)
                 {
-                    // make sure new contact displays normally when navigating back to CredentialList Page
+                    // make sure new credential displays normally when navigating back to CredentialList Page
                     credential.ID = primaryKey;
 
-                    // Add contact to ui.
+                    // Add credential to ui.
                     listviewCredentialsSource.Add(credential);
                 }
 
@@ -350,7 +348,6 @@ namespace PasswordSafe
                     securityQuestions.Remove(pair.Key);
                     credential.SecurityQuestions = JsonConvert.SerializeObject(securityQuestions);
                     listviewQuestions.ItemsSource = JsonConvert.DeserializeObject<Dictionary<string, string>>(credential.SecurityQuestions);
-                    //todo!! Do we need to update the ui if implement IPropertyChange on SecurityQuestions in Credential class
                 }
             }
             else {
